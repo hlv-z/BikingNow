@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "HnfhBVcKEnsahwA1fGIv28x738cv1wgNpyyNYJxjDyaCU2EwedmuC68QHj9IBpkipqQviPCVjXBuoWVP8AiwHQ==",
+  "dgSpecHash": "lID9OKbQqPU3jIObMxV32ZBhi1I1fSM4kSJhOKIOFQVXjzlLscJCvYj4XXviQ5epIrC84xIOhGYcO2TCtym+yw==",
   "success": true,
   "projectFilePath": "D:\\Project\\ПРП\\TokyoBike\\TokyoBike\\TokyoBike.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\keretsman\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\5.0.6\\microsoft.aspnetcore.authentication.google.5.0.6.nupkg.sha512",
     "C:\\Users\\keretsman\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\3.1.15\\microsoft.aspnetcore.authentication.jwtbearer.3.1.15.nupkg.sha512",
     "C:\\Users\\keretsman\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\keretsman\\.nuget\\packages\\microsoft.data.sqlclient\\2.0.1\\microsoft.data.sqlclient.2.0.1.nupkg.sha512",

@@ -53,3 +53,4 @@ D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\TokyoBike.dll
 D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\ref\TokyoBike.dll
 D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\TokyoBike.pdb
 D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\TokyoBike.genruntimeconfig.cache
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.Google.dll

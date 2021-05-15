@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using TokyoBike.Helpers;
 using TokyoBike.Models;
 
 namespace TokyoBike
@@ -31,9 +34,15 @@ namespace TokyoBike
             string connection = Configuration.GetConnectionString("DefaultConnection");
                 services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
+            services.AddAuthentication(o => 
                     {
+                        o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        
+                    }).AddCookie(o=> {
+                        o.LoginPath = "/api/auth/googleAuth";
+                    })
+                    /*.AddJwtBearer(options =>
+                    {                          
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
@@ -54,7 +63,15 @@ namespace TokyoBike
                             // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
                         };
+                        
+                    })          */          
+                    .AddGoogle(options => 
+                    {
+                        options.ClientId = "787959739663-8qapdbsa63n33opc7b6tk70blh375jck.apps.googleusercontent.com";
+                        options.ClientSecret = "XvsVMrLmclt3uTRpHkbcUme6";                        
+
                     });
+            
             services.AddControllersWithViews();
            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
@@ -71,6 +88,8 @@ namespace TokyoBike
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

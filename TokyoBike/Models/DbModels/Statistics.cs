@@ -13,7 +13,9 @@ namespace TokyoBike.Models.DbModels
     {
         [Key]
         public int StatisticId { get; set; }    
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User User { get; set; }
         public IEnumerable<Day> Days { get; set; }
         public List<UserRate> Rates { get; set; }
     }

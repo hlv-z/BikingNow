@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TokyoBike.Helpers;
 using TokyoBike.Models;
 using TokyoBike.Models.DbModels;
 
@@ -12,6 +13,7 @@ namespace TokyoBike.Controllers
 {
     [Route("api/[controller]")]
     //[ApiController]
+    [Authorize]
     public class SightseenController : Controller
     {
         ApplicationContext appCtx;
@@ -21,14 +23,22 @@ namespace TokyoBike.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Sightseen> Get()
+        public IActionResult Get()
         {
+            var result = HttpContext.User.Claims.Select(claim => new
+            {
+                claim.Issuer,
+                claim.OriginalIssuer,
+                claim.Type,
+                claim.Value
+            }).ToList();
             IEnumerable<Sightseen> ss = appCtx.Sightseens.ToList();
-            return ss;
+            return Json(new { result, ss});
         }
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
+           
             Sightseen sightseen = appCtx.Sightseens.FirstOrDefault(s => s.Id == id);
             if (sightseen != null)
             {
@@ -37,13 +47,13 @@ namespace TokyoBike.Controllers
             return BadRequest(new { errorText = "Invalid username or password." });
         }
         [HttpPost("rate")]
-        public void Rate(int Sightseenid, int UserId, int rate)
+        public void Rate(int Sightseenid, int rate)
         {
             Sightseen sightseen = appCtx.Sightseens.FirstOrDefault(s => s.Id == Sightseenid);
-            User user = appCtx.Users.Include(u => u.Statistics).Include(s => s.Statistics.Days).Include(s => s.Statistics.Rates).FirstOrDefault(u => u.Id == UserId);         
+            User user = (User)HttpContext.Items["User"];         
             if (user.Statistics.Rates.Where(s => s.SightseenId == Sightseenid).FirstOrDefault() == null)
             {
-                UserRate ur = new UserRate { StatisticsId = user.StatisticsId, Rate = rate, SightseenId = sightseen.Id, Sightseen = sightseen };
+                UserRate ur = new UserRate { StatisticsId = (int)user.StatisticsId, Rate = rate, SightseenId = sightseen.Id, Sightseen = sightseen };
                 user.Statistics.Rates.Add(ur);
                 sightseen.Count++;
                 sightseen.BaseRate += rate;

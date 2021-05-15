@@ -4,7 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TokyoBike.Models;
@@ -13,9 +17,9 @@ using TokyoBike.Models.DbModels;
 namespace TokyoBike.Controllers
 {
     //[ApiController]
-    [Route("api/[controller]")]
-
-    public class AuthController : ControllerBase
+    [Route("api/[controller]")]   
+    
+    public class AuthController : Controller
     {
         ApplicationContext appCtx;
         public AuthController(ApplicationContext context)
@@ -23,10 +27,81 @@ namespace TokyoBike.Controllers
             appCtx = context;
         }
 
-        [HttpPost("token")]       
-        public object Token(string username, string password)
+        [Route("googleAuth")]
+        public IActionResult GoogleAuth()
+        {            
+            var propertis = new AuthenticationProperties { RedirectUri = "/api/auth/google-response" };
+
+            return Challenge(propertis, GoogleDefaults.AuthenticationScheme);
+        }
+        [Route("google-response")]
+        public async Task<IActionResult> GoogleResponse()
         {
-            var identity = GetIdentity(username, password);
+            var responce =  await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var result = responce.Principal.Identities.FirstOrDefault().Claims.Select(claim => new
+            {
+                claim.Issuer,
+                claim.OriginalIssuer,
+                claim.Type,
+                claim.Value                
+            }).ToArray();
+
+            User user = new User
+            {
+                Login = result[1].Value,
+                Email = result[result.Length - 1].Value
+            };
+            
+            if(appCtx.Users.FirstOrDefault(u => u.Email == user.Email) == null)
+            {
+                AddUser(user.Login, null, user.Email);
+            }
+            HttpContext.Items["User"] = appCtx.Users.FirstOrDefault(u => u.Email == user.Email);
+
+            return Token(user.Email, null);
+        }
+
+        [Route("google-logout")]
+        public async Task<IActionResult> GoogleLogout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var result = HttpContext.User.Claims.Select(claim => new
+            {
+                claim.Issuer,
+                claim.OriginalIssuer,
+                claim.Type,
+                claim.Value
+            });
+
+            return Json(result);
+        }
+
+        public User AddUser(string login, string password, string email)
+        {
+            //Validation
+            User user = new User { Email = email, Password = password, Role = "user", Login = login };
+            appCtx.Users.Add(user);
+            appCtx.SaveChanges();
+            var u = appCtx.Users.ToList().Last();
+            u.Statistics = new Statistics { UserId = u.Id };
+            appCtx.Entry(u).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            appCtx.SaveChanges();
+
+            return user;
+        }
+
+        [HttpPost("register")]
+        public IActionResult Register(string login, string password, string email)        
+        {
+            AddUser(login, password, email);
+            return Token(email, password);
+        }
+
+        [HttpPost("token")]       
+        public IActionResult Token(string username, string password)
+        {
+            User user = appCtx.Users.FirstOrDefault(x => x.Email == username && x.Password == password);
+            var identity = GetIdentity(user);
             if (identity == null)
             {
                 return BadRequest(new { errorText = "Invalid username or password." });
@@ -39,30 +114,24 @@ namespace TokyoBike.Controllers
                     audience: AuthOptions.AUDIENCE,
                     notBefore: now,
                     claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    expires: now.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);           
 
-            var response = new
-            {
-                access_token = encodedJwt,
-                username = identity.Name
-            };
-
-            return response;
+            return Json(new AuthResponse(user, encodedJwt));
         }
 
-        private ClaimsIdentity GetIdentity(string username, string password)
+        private ClaimsIdentity GetIdentity(User u)
         {
-            User person = appCtx.Users.FirstOrDefault(x => x.Login == username && x.Password == password);
-            if (person != null)
+            
+            if (u != null)
             {
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Login),
-                    new Claim("Password", person.Password),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
+                {                    
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, u.Email),
+                    new Claim("id", u.Id.ToString()),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, u.Role)
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

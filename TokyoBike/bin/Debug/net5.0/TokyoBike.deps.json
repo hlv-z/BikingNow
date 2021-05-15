@@ -33,6 +33,7 @@
     ".NETCoreApp,Version=v5.0": {
       "TokyoBike/1.0.0": {
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Google": "5.0.6",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "3.1.15",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.6",
           "Microsoft.AspNetCore.Antiforgery": "5.0.0.0",
@@ -322,6 +323,17 @@
         },
         "compile": {
           "TokyoBike.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.Google/5.0.6": {
+        "runtime": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "assemblyVersion": "5.0.6.0",
+            "fileVersion": "5.0.621.22305"
+          }
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.AspNetCore.Authentication.Google.dll": {}
         }
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer/3.1.15": {
@@ -3001,6 +3013,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Microsoft.AspNetCore.Authentication.Google/5.0.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-T/3g1kbLGlmXTbnlM/uu+a8zfghGQ7MB5M/Pw471Q9Ldo+g0DWpo/gwrb7BGePnOqDFo9p5eryFeFXPdU04Q1Q==",
+      "path": "microsoft.aspnetcore.authentication.google/5.0.6",
+      "hashPath": "microsoft.aspnetcore.authentication.google.5.0.6.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/3.1.15": {
       "type": "package",
