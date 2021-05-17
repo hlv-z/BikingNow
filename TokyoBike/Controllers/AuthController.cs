@@ -101,7 +101,7 @@ namespace TokyoBike.Controllers
             User u = AddUser(us.Login, us.Password, us.Email);
             if (u != null)
             {
-                return Ok();
+                return Authenticate(new UserModel { Email = u.Email, Password = u.Password});
             }
             return BadRequest(new { errormesage = "This email is already used" });
         }

@@ -6,7 +6,7 @@ namespace TokyoBike.Models.DbModels
     {
         public int Id { get; set; }
         public int StatisticsId { get; set; }
-        public DateTime Date { get; set; }
+        public long Date { get; set; }
         public double Km { get; set; }
     }
 }

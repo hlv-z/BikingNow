@@ -55,3 +55,13 @@ D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\TokyoBike.pdb
 D:\Project\ПРП\TokyoBike\TokyoBike\obj\Debug\net5.0\TokyoBike.genruntimeconfig.cache
 D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.Google.dll
 D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\LiqPay.SDK.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Humanizer.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Core.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Identity.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Storage.Blobs.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Storage.Common.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Storage.Files.Shares.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Azure.Storage.Queues.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\Project\ПРП\TokyoBike\TokyoBike\bin\Debug\net5.0\Microsoft.Extensions.Azure.dll

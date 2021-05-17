@@ -152,7 +152,7 @@ namespace TokyoBike.Controllers
                 Email = "ilyaker1806@gmail.com",
                 Amount = 1,
                 Currency = "UAH",
-                OrderId = "15",
+                OrderId = "16",
                 Action = LiqPayRequestAction.InvoiceSend,
                 Language = LiqPayRequestLanguage.RU
             };
