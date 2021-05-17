@@ -24,16 +24,9 @@ namespace TokyoBike.Controllers
 
         [HttpGet]
         public IActionResult Get()
-        {
-            var result = HttpContext.User.Claims.Select(claim => new
-            {
-                claim.Issuer,
-                claim.OriginalIssuer,
-                claim.Type,
-                claim.Value
-            }).ToList();
+        {           
             IEnumerable<Sightseen> ss = appCtx.Sightseens.ToList();
-            return Json(new { result, ss});
+            return Json(ss);
         }
         [HttpGet("{id}")]
         public IActionResult Get(int id)

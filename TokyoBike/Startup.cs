@@ -34,12 +34,13 @@ namespace TokyoBike
             string connection = Configuration.GetConnectionString("DefaultConnection");
                 services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
+            
             services.AddAuthentication(o => 
                     {
                         o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         
                     }).AddCookie(o=> {
-                        o.LoginPath = "/api/auth/googleAuth";
+                        //o.LoginPath = "/api/auth/googleAuth";
                     })
                     /*.AddJwtBearer(options =>
                     {                          
@@ -67,9 +68,9 @@ namespace TokyoBike
                     })          */          
                     .AddGoogle(options => 
                     {
+                        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         options.ClientId = "787959739663-8qapdbsa63n33opc7b6tk70blh375jck.apps.googleusercontent.com";
-                        options.ClientSecret = "XvsVMrLmclt3uTRpHkbcUme6";                        
-
+                        options.ClientSecret = "XvsVMrLmclt3uTRpHkbcUme6"; 
                     });
             
             services.AddControllersWithViews();
@@ -79,6 +80,11 @@ namespace TokyoBike
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Strict
+            });
+
             app.UseDeveloperExceptionPage();
 
             app.UseDefaultFiles();
@@ -86,9 +92,10 @@ namespace TokyoBike
 
             app.UseRouting();
 
+            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>

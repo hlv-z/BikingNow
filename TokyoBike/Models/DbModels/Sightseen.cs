@@ -17,7 +17,7 @@ namespace TokyoBike.Models.DbModels
         public int BaseRate { get; set; }
 
         [NotMapped]
-        public double UserRate { get => Count != 0 ? BaseRate / Count : 0; }        
+        public double UserRate { get => Count != 0 ? (double)BaseRate / (double)Count : 0; }        
 
     }
 }

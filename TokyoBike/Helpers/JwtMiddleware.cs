@@ -60,8 +60,7 @@ namespace TokyoBike.Helpers
             }
             catch(Exception ex)
             {
-                context.Response.WriteAsync(ex.Message);
-                // todo: need to add logger
+                                // todo: need to add logger
             }
         }
     }

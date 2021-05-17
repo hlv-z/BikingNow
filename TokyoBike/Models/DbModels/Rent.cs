@@ -13,7 +13,7 @@ namespace TokyoBike.Models.DbModels
         public int UserId { get; set; }
         public User User { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
     }
 }

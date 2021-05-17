@@ -58,7 +58,7 @@ namespace TokyoBike.Controllers
             }
             HttpContext.Items["User"] = appCtx.Users.FirstOrDefault(u => u.Email == user.Email);
 
-            return Token(user.Email, null);
+            return Authenticate(new UserModel { Email = user.Email, Password = null});
         }
 
         [Route("google-logout")]
@@ -78,29 +78,38 @@ namespace TokyoBike.Controllers
 
         public User AddUser(string login, string password, string email)
         {
-            //Validation
-            User user = new User { Email = email, Password = password, Role = "user", Login = login };
-            appCtx.Users.Add(user);
-            appCtx.SaveChanges();
-            var u = appCtx.Users.ToList().Last();
-            u.Statistics = new Statistics { UserId = u.Id };
-            appCtx.Entry(u).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            appCtx.SaveChanges();
+            if (appCtx.Users.FirstOrDefault(u => u.Email == email) == null)
+            {
+                //Validation
+                User user = new User { Email = email, Password = password, Role = "user", Login = login };
 
-            return user;
+                appCtx.Users.Add(user);
+                appCtx.SaveChanges();
+                var u = appCtx.Users.ToList().Last();
+                u.Statistics = new Statistics { UserId = u.Id };
+                appCtx.Entry(u).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                appCtx.SaveChanges();
+
+                return user;
+            }
+            return null;
         }
 
         [HttpPost("register")]
-        public IActionResult Register(string login, string password, string email)        
+        public IActionResult Register([FromBody] UserModel us)        
         {
-            AddUser(login, password, email);
-            return Token(email, password);
+            User u = AddUser(us.Login, us.Password, us.Email);
+            if (u != null)
+            {
+                return Ok();
+            }
+            return BadRequest(new { errormesage = "This email is already used" });
         }
 
-        [HttpPost("token")]       
-        public IActionResult Token(string username, string password)
+        [HttpPost("authenticate")]       
+        public IActionResult Authenticate([FromBody]UserModel us)
         {
-            User user = appCtx.Users.FirstOrDefault(x => x.Email == username && x.Password == password);
+            User user = appCtx.Users.FirstOrDefault(x => x.Email == us.Email && x.Password == us.Password);
             var identity = GetIdentity(user);
             if (identity == null)
             {
