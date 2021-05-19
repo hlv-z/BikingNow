@@ -10,7 +10,10 @@ namespace TokyoBike.Models.ResponseModels
     {
         public string Login { get; set; }
         public string Email { get; set; }
-        public IEnumerable<Day> Days { get; set; }
+        public IEnumerable<Day> Today { get; set; }
+        public IEnumerable<Day> Week { get; set; }
+        public IEnumerable<Day> Month { get; set; }
+        public IEnumerable<Day> Year { get; set; }
 
     }
 }

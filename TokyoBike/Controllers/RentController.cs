@@ -43,10 +43,13 @@ namespace TokyoBike.Controllers
             switch (rrq.Type)
             {
                 case "shortest":
+                    StartRent(new RentModel { BikeId = rrq.BikeId });
                     return Json(ShortRoute(rrq));
                 case "tourist":
+                    StartRent(new RentModel { BikeId = rrq.BikeId });
                     return Json(TouristRoute(rrq));
                 case "free":
+                    StartRent(new RentModel { BikeId = rrq.BikeId });
                     return Json(FreeRoute(rrq));
                 default:
                     return BadRequest(new { errorMessage = "Type of route is undefined" });
@@ -171,12 +174,21 @@ namespace TokyoBike.Controllers
             return Ok();
 
         }
+
         [HttpPost("endRent")]
         public async Task<IActionResult> EndRent([FromBody] RentModel rm)
         {
             User user = (User)HttpContext.Items["User"];
             Rent rent = appCtx.Rents.Include(r => r.Bike).Include(r => r.User).Where(r => r.BikeId == rm.BikeId && r.EndTime == null).FirstOrDefault();
-            
+            long dateticks = DateTime.Now.Ticks;
+            Random random = new Random();
+            Day day = new Day()
+            {
+                Date = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds,
+                Km = random.Next(5, 15),
+                StatisticsId = (int)user.StatisticsId                
+            };
+            appCtx.Days.Add(day);
             if (rent != null)
             {
                 rent.EndTime = DateTime.Now;
@@ -191,6 +203,7 @@ namespace TokyoBike.Controllers
         public async Task LiqPay(User u, Rent r)
         {
             double price = (r.EndTime - r.StartTime).Value.Hours * 30;
+            price = price == 0 ? 30 : price; 
             var invoiceRequest = new LiqPayRequest
             {
                 Email = u.Email,

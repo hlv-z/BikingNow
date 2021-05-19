@@ -40,13 +40,16 @@ namespace TokyoBike.Controllers
             {
                 Email = user.Email,
                 Login = user.Login,
-                Days = days
+                Today = days,
+                Week = Get("week"),
+                Month = Get("month"),
+                Year = Get("year")
             };
             return Json(uar);
         }
 
-        [HttpGet("{timePeriod}")]
-        public IActionResult Get(string timePeriod)
+        //[HttpGet("{timePeriod}")]
+        public IEnumerable<Day> Get(string timePeriod)
         {
             User user = (User)HttpContext.Items["User"];
             DateTime dt = new DateTime(1970, 01, 01);
@@ -95,13 +98,8 @@ namespace TokyoBike.Controllers
                     break;
             }
              
-            UserAccountResponse uar = new UserAccountResponse
-            {
-                Email = user.Email,
-                Login = user.Login,
-                Days = days
-            };
-            return Json(uar);
+            
+            return days;
         }
     }
 }

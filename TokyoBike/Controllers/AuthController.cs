@@ -63,10 +63,10 @@ namespace TokyoBike.Controllers
                 AddUser(user.Login, null, user.Email);
             }
             HttpContext.Items["User"] = appCtx.Users.FirstOrDefault(u => u.Email == user.Email);
-            string htmlResponse = "<script>window.postMessage(";
+            string htmlResponse = "<script>window.postMessage('";
             
             var json = JsonSerializer.Serialize(Authenticate(new UserModel { Email = user.Email, Password = null }));
-            htmlResponse += json + ")</script>";
+            htmlResponse += json + "')</script>";
             
             
             return new ContentResult
