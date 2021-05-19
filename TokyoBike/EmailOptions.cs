@@ -8,6 +8,6 @@ namespace TokyoBike
     public class EmailOptions
     {
         public const string Email = "ilyaker1806@gmail.com";
-        public const string Password = "rthtwvfy18";
+        public const string Password = "";
     }
 }
