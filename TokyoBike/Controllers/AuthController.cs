@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -13,6 +15,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TokyoBike.Models;
 using TokyoBike.Models.DbModels;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace TokyoBike.Controllers
 {
@@ -35,7 +40,8 @@ namespace TokyoBike.Controllers
             return Challenge(propertis, GoogleDefaults.AuthenticationScheme);
         }
         [Route("google-response")]
-        public async Task<IActionResult> GoogleResponse()
+        
+        public async Task<ContentResult> GoogleResponse()
         {
             var responce =  await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var result = responce.Principal.Identities.FirstOrDefault().Claims.Select(claim => new
@@ -57,8 +63,18 @@ namespace TokyoBike.Controllers
                 AddUser(user.Login, null, user.Email);
             }
             HttpContext.Items["User"] = appCtx.Users.FirstOrDefault(u => u.Email == user.Email);
-
-            return Authenticate(new UserModel { Email = user.Email, Password = null});
+            string htmlResponse = "<script>window.postMessage(";
+            
+            var json = JsonSerializer.Serialize(Authenticate(new UserModel { Email = user.Email, Password = null }));
+            htmlResponse += json + ")</script>";
+            
+            
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                StatusCode = (int)HttpStatusCode.OK,
+                Content = htmlResponse
+            }; 
         }
 
         [Route("google-logout")]
@@ -101,19 +117,30 @@ namespace TokyoBike.Controllers
             User u = AddUser(us.Login, us.Password, us.Email);
             if (u != null)
             {
-                return Authenticate(new UserModel { Email = u.Email, Password = u.Password});
+
+                return Json(Authenticate(new UserModel { Email = u.Email, Password = u.Password}));
             }
             return BadRequest(new { errormesage = "This email is already used" });
         }
 
-        [HttpPost("authenticate")]       
-        public IActionResult Authenticate([FromBody]UserModel us)
+        [HttpPost("authenticate")]     
+        public IActionResult Authentication([FromBody] UserModel us)
+        {
+            var a = Authenticate(us);
+            if(a == null)
+            {
+                return new UnauthorizedResult();
+            }
+            return Json(a);
+        }
+
+        public AuthResponse Authenticate(UserModel us)
         {
             User user = appCtx.Users.FirstOrDefault(x => x.Email == us.Email && x.Password == us.Password);
             var identity = GetIdentity(user);
             if (identity == null)
             {
-                return BadRequest(new { errorText = "Invalid username or password." });
+                return null;
             }
 
             var now = DateTime.UtcNow;
@@ -128,7 +155,7 @@ namespace TokyoBike.Controllers
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);           
 
-            return Json(new AuthResponse(user, encodedJwt));
+            return new AuthResponse(user, encodedJwt);
         }
 
         private ClaimsIdentity GetIdentity(User u)

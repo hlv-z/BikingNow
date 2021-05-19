@@ -44,6 +44,7 @@ namespace TokyoBike
                         o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         
                     }).AddCookie(o=> {
+                        o.Cookie.SameSite = SameSiteMode.Unspecified;
                         //o.LoginPath = "/api/auth/googleAuth";
                     })
                     /*.AddJwtBearer(options =>
@@ -89,10 +90,10 @@ namespace TokyoBike
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            app.UseCookiePolicy(new CookiePolicyOptions
+           /* app.UseCookiePolicy(new CookiePolicyOptions
             {
                 MinimumSameSitePolicy = SameSiteMode.Strict
-            });
+            });*/
 
             app.UseDeveloperExceptionPage();
 

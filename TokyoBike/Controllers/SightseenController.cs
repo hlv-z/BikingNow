@@ -39,7 +39,7 @@ namespace TokyoBike.Controllers
             }
             return BadRequest(new { errorText = "Invalid username or password." });
         }
-        [HttpPost("rate")]
+        [HttpPost("rate/{Sightseenid}/{rate}")]
         public void Rate(int Sightseenid, int rate)
         {
             Sightseen sightseen = appCtx.Sightseens.FirstOrDefault(s => s.Id == Sightseenid);

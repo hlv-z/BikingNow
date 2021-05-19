@@ -10,11 +10,11 @@ using TokyoBike.Models;
 using TokyoBike.Models.DbModels;
 
 namespace TokyoBike.Controllers
-{
+{    
     [Route("api/[controller]")]
     //[ApiController]
     [Authorize]
-    public class AdminController : ControllerBase
+    public class AdminController : Controller
     {
         ApplicationContext appCtx;
         public AdminController(ApplicationContext ctx)
@@ -60,6 +60,7 @@ namespace TokyoBike.Controllers
                 BaseRate = 0,
                 Count = 0,
                 Discription = ssm.Discription,
+                ImagePath = ssm.ImagePath,
                 Name = ssm.Name,
                 Point = new Point { X = (float)ssm.X, Y = (float)ssm.Y },
                 Type = "sightseen"
@@ -67,9 +68,10 @@ namespace TokyoBike.Controllers
             appCtx.Sightseens.Add(ss);
             appCtx.SaveChanges();
             return Ok();
-        }
+        }        
+
         [HttpPost("editSightseen")]
-        public IActionResult EditSightseen([FromBody] SightseenModel ssm)
+        public IActionResult EditSightseen(SightseenModel ssm)
         {
             Sightseen ss = appCtx.Sightseens.FirstOrDefault(s => s.Id == ssm.Id);
             if(ss != null)

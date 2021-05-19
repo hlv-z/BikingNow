@@ -5,6 +5,9 @@
     <Controller_SelectedScaffolderCategoryPath>root/Common/Api</Controller_SelectedScaffolderCategoryPath>
     <ActiveDebugProfile>IIS Express</ActiveDebugProfile>
     <NameOfLastUsedPublishProfile>BikingNow - Web Deploy</NameOfLastUsedPublishProfile>
+    <View_SelectedScaffolderID>RazorViewScaffolder</View_SelectedScaffolderID>
+    <View_SelectedScaffolderCategoryPath>root/Common/MVC/View</View_SelectedScaffolderCategoryPath>
+    <WebStackScaffolding_ViewDialogWidth>650</WebStackScaffolding_ViewDialogWidth>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

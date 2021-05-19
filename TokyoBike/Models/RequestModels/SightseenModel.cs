@@ -11,6 +11,7 @@ namespace TokyoBike.Models
         public float? X { get; set;}
         public float? Y { get; set; }        
         public string Name { get; set; }
+        public string ImagePath { get; set; }
         public string Discription { get; set; }
     }
 }

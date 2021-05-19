@@ -11,6 +11,7 @@ namespace TokyoBike.Models.DbModels
         public int Id { get; set; }
         public Point Point { get; set; }
         public string Type { get; set; }
+        public string ImagePath { get; set; }
         public string Name { get; set; }
         public string Discription { get; set; }
         public int Count { get; set; }        

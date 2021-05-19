@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using TokyoBike.Helpers;
 using TokyoBike.Models;
@@ -17,7 +18,7 @@ namespace TokyoBike.Controllers
 {
     [Route("api/[controller]")]
     //[ApiController]
-    //[Authorize]
+    [Authorize]
     public class RentController : Controller
     {
         ApplicationContext appCtx;
@@ -27,6 +28,15 @@ namespace TokyoBike.Controllers
             appCtx = ctx;
         }
 
+        [HttpGet("getStations")]
+        public IActionResult GetStations()
+        {
+            List<IPointable> pointable = appCtx.Sightseens.Cast<IPointable>().ToList();
+            pointable.AddRange(appCtx.Stations.ToList());
+            return Json(pointable);
+        }
+
+        //"api/rent/chooseRoute"
         [HttpPost("chooseRoute")]
         public IActionResult ChooseRoute([FromBody] RouteRequest rrq)
         {
@@ -128,31 +138,65 @@ namespace TokyoBike.Controllers
             return BadRequest();
         }
 
+
+        [HttpGet("checkExpireRent")]
+        public IActionResult CheckExpireRent()
+        {
+            IEnumerable<Rent> rents = appCtx.Rents.Include(r => r.Bike).Include(r => r.User).Where(r => r.StartTime.CompareTo(DateTime.Now.AddDays(-1)) < 0).ToList();
+            foreach(var r in rents)
+            {
+                User u = appCtx.Users.FirstOrDefault(u => u.Id == r.UserId);
+                // отправитель - устанавливаем адрес и отображаемое в письме имя
+                MailAddress from = new MailAddress(EmailOptions.Email, "BikingNow");
+                // кому отправляем
+                MailAddress to = new MailAddress(u.Email);
+                // создаем объект сообщения
+                MailMessage m = new MailMessage(from, to);
+                // тема письма
+                m.Subject = "Просроченная аренда";
+                // текст письма
+                m.Body = "<h2>Уважаемый клиент, время вашей аренды истекло. Будьте добры вернуть велик на место, плиз</h2>";
+                // письмо представляет код html
+                m.IsBodyHtml = true;
+                // адрес smtp-сервера и порт, с которого будем отправлять письмо
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    // логин и пароль
+                    smtp.Credentials = new NetworkCredential(EmailOptions.Email, EmailOptions.Password);
+                    smtp.EnableSsl = true;
+                    smtp.Send(m);
+                }
+            }
+            return Ok();
+
+        }
         [HttpPost("endRent")]
         public async Task<IActionResult> EndRent([FromBody] RentModel rm)
         {
-            await LiqPay();
+            User user = (User)HttpContext.Items["User"];
             Rent rent = appCtx.Rents.Include(r => r.Bike).Include(r => r.User).Where(r => r.BikeId == rm.BikeId && r.EndTime == null).FirstOrDefault();
+            
             if (rent != null)
             {
                 rent.EndTime = DateTime.Now;
                 appCtx.Entry(rent).State = EntityState.Modified;
                 appCtx.SaveChanges();
+                await LiqPay(user, rent);
                 return Ok();
             }
             return BadRequest();
         }
 
-        [HttpGet("LiqPay")]
-        public async Task LiqPay()
+        public async Task LiqPay(User u, Rent r)
         {
-            
+            double price = (r.EndTime - r.StartTime).Value.Hours * 30;
             var invoiceRequest = new LiqPayRequest
             {
-                Email = "ilyaker1806@gmail.com",
-                Amount = 1,
+                Email = u.Email,
+                Amount = price,
                 Currency = "UAH",
-                OrderId = "16",
+                OrderId = r.RentId.ToString(),
                 Action = LiqPayRequestAction.InvoiceSend,
                 Language = LiqPayRequestLanguage.RU
             };
@@ -160,14 +204,7 @@ namespace TokyoBike.Controllers
             var liqPayClient = new LiqPayClient("sandbox_i33754480935", "sandbox_H2hSOXg3sjkkhpV42jcSVTWvNTiwtjbKvfFYr2n6");
             //liqPayClient.IsCnbSandbox = true;
             var response = await liqPayClient.RequestAsync("request", invoiceRequest);
-
-
-        }
-        [HttpPost("liqpay-response")]
-        public void LiqPayResponse()
-        {
-
-        }
+        }        
     }
    
 }

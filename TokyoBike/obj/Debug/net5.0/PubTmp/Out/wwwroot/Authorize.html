@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Authorize</title>
+</head>
+<body>    
+        <input type="text" class="login" id="login"/>
+        <input type="password" class="password" id="password" />
+
+        <input type="submit" onclick="async () => await collectData()">
+</body>
+    <script>
+        const url = "http://localhost:44336/api/auth/register";
+        const data = {};
+        const onClick =
+       async function collectData() {
+            data.login = document.getElementById("login").value;
+            data.password = document.getElementById("password").value;
+            await request();
+       }
+
+       async function request(){
+           try {
+               const response = await fetch(url, {
+                   method: 'POST', // или 'PUT'
+                   body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+                   headers: {
+                       'Content-Type': 'application/json'
+                   }
+               });
+
+
+               const json = await response.json();
+               console.log('Успех:', JSON.stringify(json));
+
+           } catch (error) {
+               console.error('Ошибка:', error);
+           }
+       }
+
+    </script>
+</html>
